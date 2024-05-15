@@ -80,11 +80,19 @@ func handleClientConnection(c net.Conn) {
 		}
 
 		received = make([]byte, 1024)
-		_, err = outConn.(net.Conn).Read(received)
-		if err != nil {
-			log.Fatalf("reading server response: %s\n", err)
+		for {
+			n, err = outConn.(net.Conn).Read(received)
+			if err != nil {
+				log.Fatalf("reading server response: %s\n", err)
+			}
+			if n == 0 {
+				continue
+			}
+			//log.Println("returned from agent", string(received[:n]))
+			c.Write(received[:n])
+			break
 		}
-		c.Write(received)
+
 	}
 	//time.Sleep(5 * time.Second)
 	//}
