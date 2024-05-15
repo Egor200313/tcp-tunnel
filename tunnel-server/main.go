@@ -16,9 +16,7 @@ var (
 func main() {
 	flag.Parse()
 	tunnelLoop()
-	//for {
 	clientLoop()
-	//}
 }
 
 func clientLoop() {
@@ -29,13 +27,14 @@ func clientLoop() {
 	defer l.Close()
 
 	log.Println("waiting for client...")
-	//for {
-	conn, err := l.Accept()
-	if err != nil {
-		log.Fatalf("accepting client connection: %s\n", err)
+	for {
+		conn, err := l.Accept()
+		if err != nil {
+			log.Fatalf("accepting client connection: %s\n", err)
+		}
+		log.Println("got client connection")
+		handleClientConnection(conn)
 	}
-	log.Println("got client connection")
-	handleClientConnection(conn)
 }
 
 func tunnelLoop() {
@@ -46,55 +45,42 @@ func tunnelLoop() {
 	defer l.Close()
 
 	log.Println("waiting for agent...")
-	//for {
 	conn, err := l.Accept()
 	if err != nil {
 		log.Fatalf("accepting agent connection: %s\n", err)
 	}
 	log.Println("got agent connection")
 	connMap.Store("1", conn)
-	//}
-	//for {
-	//conn.Write([]byte("hb"))
-	//}
 }
 
 func handleClientConnection(c net.Conn) {
 	defer c.Close()
 
-	//for {
 	received := make([]byte, 1024)
 	n, err := c.Read(received)
-	//n, err := io.ReadFull(c, received)
-	log.Println(n)
 	if err != nil {
 		log.Fatalf("reading client request: %s\n", err)
 	}
-	//log.Println(received)
-	if outConn, ok := connMap.Load("1"); ok {
+	if agentConn, ok := connMap.Load("1"); ok {
 		outMsg := received[:n]
 		log.Println(string(outMsg), len(outMsg))
-		_, err := outConn.(net.Conn).Write(outMsg)
+		_, err := agentConn.(net.Conn).Write(outMsg)
 		if err != nil {
 			log.Fatalf("sending client request: %s\n", err)
 		}
 
 		received = make([]byte, 1024)
 		for {
-			n, err = outConn.(net.Conn).Read(received)
+			n, err = agentConn.(net.Conn).Read(received)
 			if err != nil {
 				log.Fatalf("reading server response: %s\n", err)
 			}
 			if n == 0 {
 				continue
 			}
-			//log.Println("returned from agent", string(received[:n]))
 			c.Write(received[:n])
 			break
 		}
 
 	}
-	//time.Sleep(5 * time.Second)
-	//}
-
 }

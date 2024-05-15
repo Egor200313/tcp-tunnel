@@ -28,13 +28,8 @@ func main() {
 
 	for {
 		received := make([]byte, 1024)
-		n, err := conn.Read(received)
-		//received, err := io.ReadAll(conn)
-		if err != nil {
-			//log.Println(err)
-		}
+		n, _ := conn.Read(received)
 		if n > 0 {
-			//log.Println(received, "from server")
 			_, err := localConn.Write(received[:n])
 			if err != nil {
 				log.Fatal(err)
@@ -45,8 +40,6 @@ func main() {
 			if err != nil {
 				log.Fatal(err)
 			}
-			//localResponse, err := io.ReadAll(localConn)
-			//log.Println("from local server response", localResponse[:n])
 			conn.Write(localResponse[:n])
 		}
 	}
