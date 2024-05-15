@@ -14,6 +14,7 @@ var (
 )
 
 func main() {
+    flag.Parse()
 	conn, err := net.Dial("tcp", strings.Join([]string{*remoteAddr, *remotePort}, ":"))
 	if err != nil {
 		log.Fatal(err)
