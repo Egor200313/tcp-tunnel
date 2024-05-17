@@ -61,11 +61,19 @@ func requestLocalResourse(request []byte) []byte {
 	}
 
 	localResponse := make([]byte, BUFFER_SIZE)
-	n, err := localConn.Read(localResponse)
-	if err != nil {
-		log.Fatal(err)
+	n := 0
+	for {
+		n, err = localConn.Read(localResponse)
+		if err != nil {
+			log.Fatal(err)
+		}
+		if n > 0 {
+			log.Println(n)
+			continue
+		}
+		break
 	}
-	log.Println(string(localResponse[:n]), n)
+	//log.Println(string(localResponse[:n]), n)
 
 	return localResponse[:n]
 }
