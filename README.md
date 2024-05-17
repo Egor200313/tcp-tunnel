@@ -11,6 +11,6 @@
 Полный пример:
 
 1. На тачке в облаке с ip 1.2.3.4 запускаем сервер. `go run tunnel-server/main.go --client-port 9090 --tunnel-port 9999`
-2. На локальном сервере запускаем агента. `go run tunnel-agent/main.go --tunnel-ip= 1.2.3.4 --tunnel-port 9999 --local-ip 127.0.0.1 --local-port 80`
+2. На локальном сервере запускаем агента. `go run tunnel-agent/main.go --tunnel-ip 1.2.3.4 --tunnel-port 9999 --local-ip 127.0.0.1 --local-port 80`
 3. на том же локальном сервере запускаем nginx на 80 порту.
 4. Из внешней сети можем обратиться к nginx по 1.2.3.4:9090
