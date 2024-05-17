@@ -14,34 +14,49 @@ var (
 )
 
 func main() {
-    flag.Parse()
-	conn, err := net.Dial("tcp", strings.Join([]string{*remoteAddr, *remotePort}, ":"))
+	flag.Parse()
+	tunnelConn, err := net.Dial("tcp", strings.Join([]string{*remoteAddr, *remotePort}, ":"))
 	if err != nil {
 		log.Fatal(err)
 	}
-	defer conn.Close()
-
-	localConn, err := net.Dial("tcp", *localResource)
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer localConn.Close()
+	defer tunnelConn.Close()
 
 	for {
 		received := make([]byte, 1024)
-		n, _ := conn.Read(received)
+		n, _ := tunnelConn.Read(received)
 		if n > 0 {
-			_, err := localConn.Write(received[:n])
-			if err != nil {
-				log.Fatal(err)
+			if string(received[:n]) == "HB" {
+				//log.Println("HB received")
+				//m, err :=
+				tunnelConn.Write([]byte("HB"))
+				//log.Println("sending to tunnel HB:", m, err)
+				continue
 			}
 
-			localResponse := make([]byte, 1024)
-			n, err := localConn.Read(localResponse)
-			if err != nil {
-				log.Fatal(err)
-			}
-			conn.Write(localResponse[:n])
+			response := requestLocalResourse(received[:n])
+			tunnelConn.Write(response)
 		}
 	}
+}
+
+func requestLocalResourse(request []byte) []byte {
+	localConn, err := net.Dial("tcp", *localResource)
+	defer localConn.Close()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	_, err = localConn.Write(request)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	localResponse := make([]byte, 1024)
+	n, err := localConn.Read(localResponse)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return localResponse[:n]
 }
