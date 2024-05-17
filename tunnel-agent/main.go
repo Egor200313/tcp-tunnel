@@ -4,18 +4,19 @@ import (
 	"flag"
 	"log"
 	"net"
-	"strings"
 )
 
 var (
-	remoteAddr    = flag.String("remote-addr", "localhost", "tunnel server addr")
-	remotePort    = flag.String("remote-port", "9999", "tunnel server port")
-	localResource = flag.String("addr", "localhost:80", "local resource address")
+	remoteIP          = flag.String("tunnel-ip", "127.0.0.1", "tunnel server addr")
+	remotePort        = flag.String("tunnel-port", "9999", "tunnel server port")
+	localResourceIp   = flag.String("local-ip", "127.0.0.1", "local resource address")
+	localResourcePort = flag.String("local-port", "80", "local resource port")
 )
 
 func main() {
 	flag.Parse()
-	tunnelConn, err := net.Dial("tcp", strings.Join([]string{*remoteAddr, *remotePort}, ":"))
+	tunnelAddr := *remoteIP + ":" + *remotePort
+	tunnelConn, err := net.Dial("tcp", tunnelAddr)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -26,10 +27,7 @@ func main() {
 		n, _ := tunnelConn.Read(received)
 		if n > 0 {
 			if string(received[:n]) == "HB" {
-				//log.Println("HB received")
-				//m, err :=
 				tunnelConn.Write([]byte("HB"))
-				//log.Println("sending to tunnel HB:", m, err)
 				continue
 			}
 
@@ -40,7 +38,8 @@ func main() {
 }
 
 func requestLocalResourse(request []byte) []byte {
-	localConn, err := net.Dial("tcp", *localResource)
+	localResourceAddr := *localResourceIp + ":" + *localResourcePort
+	localConn, err := net.Dial("tcp", localResourceAddr)
 	defer localConn.Close()
 	if err != nil {
 		log.Fatal(err)

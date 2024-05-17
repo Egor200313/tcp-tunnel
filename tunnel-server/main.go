@@ -24,7 +24,6 @@ func main() {
 
 func heartBeatsRoutine(conn *net.TCPConn) {
 	for {
-		//log.Println("sending HB")
 		_, err := conn.Write([]byte("HB"))
 		if err != nil {
 			return
@@ -99,9 +98,6 @@ func receiver() {
 			log.Fatalf("reading response from tunnel: %s\n", err)
 		}
 		if n == 0 || string(received[:n]) == "HB" {
-			// if string(received[:n]) == "HB" {
-			// 	log.Println("got HB")
-			// }
 			continue
 		}
 
