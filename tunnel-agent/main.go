@@ -2,20 +2,25 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"log"
 	"net"
 )
 
 var (
-	remoteIP          = flag.String("tunnel-ip", "127.0.0.1", "tunnel server addr")
-	remotePort        = flag.String("tunnel-port", "9999", "tunnel server port")
+	tunnelIP          = flag.String("tunnel-ip", "127.0.0.1", "tunnel server addr")
+	tunnelPort        = flag.Int("tunnel-port", 9999, "tunnel server port")
 	localResourceIp   = flag.String("local-ip", "127.0.0.1", "local resource address")
-	localResourcePort = flag.String("local-port", "80", "local resource port")
+	localResourcePort = flag.Int("local-port", 80, "local resource port")
 )
+
+func makeAddr(ip string, port int) string {
+	return ip + ":" + fmt.Sprint(port)
+}
 
 func main() {
 	flag.Parse()
-	tunnelAddr := *remoteIP + ":" + *remotePort
+	tunnelAddr := makeAddr(*tunnelIP, *tunnelPort)
 	tunnelConn, err := net.Dial("tcp", tunnelAddr)
 	if err != nil {
 		log.Fatal(err)
@@ -38,7 +43,7 @@ func main() {
 }
 
 func requestLocalResourse(request []byte) []byte {
-	localResourceAddr := *localResourceIp + ":" + *localResourcePort
+	localResourceAddr := makeAddr(*localResourceIp, *localResourcePort)
 	localConn, err := net.Dial("tcp", localResourceAddr)
 	defer localConn.Close()
 	if err != nil {

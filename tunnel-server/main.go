@@ -48,7 +48,6 @@ func clientLoop() {
 		if err != nil {
 			log.Fatalf("accepting client connection: %s\n", err)
 		}
-		log.Println("got client connection")
 		transferClientRequestToTunnel()
 	}
 }
@@ -80,7 +79,6 @@ func transferClientRequestToTunnel() {
 	}
 	if tunnelConn != nil {
 		tunnelMsg := receivedFromClient[:n]
-		log.Println(string(tunnelMsg))
 		_, err := tunnelConn.Write(tunnelMsg)
 		if err != nil {
 			log.Fatalf("sending client request to tunnel: %s\n", err)
