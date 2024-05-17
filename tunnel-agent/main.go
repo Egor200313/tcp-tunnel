@@ -65,6 +65,7 @@ func requestLocalResourse(request []byte) []byte {
 	if err != nil {
 		log.Fatal(err)
 	}
+	log.Println(string(localResponse[:n]), n)
 
 	return localResponse[:n]
 }
