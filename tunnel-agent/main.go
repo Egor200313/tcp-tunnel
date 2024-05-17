@@ -14,6 +14,10 @@ var (
 	localResourcePort = flag.Int("local-port", 80, "local resource port")
 )
 
+const (
+	BUFFER_SIZE = 100000
+)
+
 func makeAddr(ip string, port int) string {
 	return ip + ":" + fmt.Sprint(port)
 }
@@ -28,7 +32,7 @@ func main() {
 	defer tunnelConn.Close()
 
 	for {
-		received := make([]byte, 1024)
+		received := make([]byte, BUFFER_SIZE)
 		n, _ := tunnelConn.Read(received)
 		if n > 0 {
 			if string(received[:n]) == "HB" {
@@ -56,7 +60,7 @@ func requestLocalResourse(request []byte) []byte {
 		log.Fatal(err)
 	}
 
-	localResponse := make([]byte, 1024)
+	localResponse := make([]byte, BUFFER_SIZE)
 	n, err := localConn.Read(localResponse)
 	if err != nil {
 		log.Fatal(err)

@@ -16,6 +16,10 @@ var (
 	clientIsResponded = make(chan struct{}, 1)
 )
 
+const (
+	BUFFER_SIZE = 100000
+)
+
 func main() {
 	flag.Parse()
 	setTunnelConn()
@@ -72,7 +76,7 @@ func setTunnelConn() {
 func transferClientRequestToTunnel() {
 	defer clientConn.Close()
 
-	receivedFromClient := make([]byte, 1024)
+	receivedFromClient := make([]byte, BUFFER_SIZE)
 	n, err := clientConn.Read(receivedFromClient)
 	if err != nil {
 		return
@@ -89,7 +93,7 @@ func transferClientRequestToTunnel() {
 }
 
 func receiver() {
-	received := make([]byte, 1024)
+	received := make([]byte, BUFFER_SIZE)
 	for {
 		n, err := tunnelConn.Read(received)
 		if err != nil {
